@@ -21,11 +21,19 @@ class MagazineluizaSpider(CrawlSpider):
         # Extract links of pagination
         Rule(LinkExtractor(
             restrict_xpaths='//li/a[@role="button" and starts-with(@aria-label,"Page ")]')),
+
+        # Extract links of itens
+        Rule(LinkExtractor(
+            restrict_xpaths='//ul[@role="main"]/a[@name="linkToProduct"]'), callback='parse_item', follow=True),
     )
 
     def parse_item(self, response):
         item = {}
         #item['domain_id'] = response.xpath('//input[@id="sid"]/@value').get()
-        #item['name'] = response.xpath('//div[@id="name"]').get()
-        #item['description'] = response.xpath('//div[@id="description"]').get()
+        item['name'] = response.xpath(
+            '//h1[@class="header-product__title"]/text()').get()
+        item['description'] = response.xpath(
+            '//div[@class="description__container-text"]/text()').get()
+        item['price'] = response.xpath(
+            '//span[@class="price-template__text"]/text()').get()
         return item
