@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.linkextractors import LinkExtractor
+from scrapy.loader import ItemLoader
 from scrapy.spiders import CrawlSpider, Rule
+
+from tutorial.items import Product
 
 
 class MagazineluizaSpider(CrawlSpider):
@@ -28,12 +31,9 @@ class MagazineluizaSpider(CrawlSpider):
     )
 
     def parse_item(self, response):
-        item = {}
-        #item['domain_id'] = response.xpath('//input[@id="sid"]/@value').get()
-        item['name'] = response.xpath(
-            '//h1[@class="header-product__title"]/text()').get()
-        item['description'] = response.xpath(
-            '//div[@class="description__container-text"]/text()').get()
-        item['price'] = response.xpath(
-            '//span[@class="price-template__text"]/text()').get()
-        return item
+        item = ItemLoader(item=Product, response=response)
+        item.add_xpath('name', '//h1[@class="header-product__title"]/text()')
+        item.add_xpath('description', '//div[@class="description__container-text"]/text()')
+        item.add_xpath('price', '//span[@class="price-template__text"]/text()')
+        item.add_value('last_updated', 'today')
+        return item.load_item()
